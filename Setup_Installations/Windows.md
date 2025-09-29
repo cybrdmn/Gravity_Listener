@@ -418,8 +418,7 @@ code .
 
 :heavy_check_mark: If you see `WSL: Ubuntu` in the bottom left corner of the VS Code window, you're good to go :+1:
 
-<img src="./images/windows_remote_wsl.png"  width="300" height="260">
-
+<img src="./images/windows_remote_wsl.
 :x: Otherwise, please **contact a teacher**
 
 ## Windows Terminal

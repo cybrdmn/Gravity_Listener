@@ -531,6 +531,43 @@ rm -f *.txt  # Deletes all .txt files in the directory
 
 - Remove all `.txt` files in the directory using a single command.
 
+# 📁 Creating and Removing Directories
+
+Managing directories is a fundamental part of working in the shell. You can create new directories and remove them using simple commands.
+
+### 📌 Creating Directories
+
+To create a new directory, use the `mkdir` (make directory) command:
+```bash
+mkdir new_folder
+```
+This creates a directory called `new_folder` in your current location.
+
+You can also create nested directories in one step using the `-p` option:
+```bash
+mkdir -p parent_folder/child_folder
+```
+This will create both `parent_folder` and `child_folder` inside it, if they do not already exist.
+
+### 🗑 Removing Directories
+
+To remove an empty directory, use the `rmdir` command:
+```bash
+rmdir new_folder
+```
+This only works if the directory is empty.
+
+To remove a directory and all its contents (be careful!), use the `rm -r` command:
+```bash
+rm -r parent_folder
+```
+The `-r` flag stands for "recursive" and will delete the directory and everything inside it.
+
+#### 📝 Exercises
+- Create a directory called `practice_dir` and then create a subdirectory called `subdir` inside it.
+- Remove `subdir` using `rmdir`, then remove `practice_dir` using `rmdir`.
+- Try removing a non-empty directory using `rmdir` and observe the error message. Then use `rm -r` to remove it.
+
 ## Summary of Commands
 
 ![Summary](./pics/summary_commands.png)
@@ -569,6 +606,75 @@ Some commands require administrative privileges.
 ```bash
 sudo apt update  # Update system package list (Linux)
 sudo reboot      # Restart the system
+```
+
+
+## 🔗 Connecting Programs
+
+Shell allows chaining commands to process data efficiently. Pipes allow chaining commands together by passing the output of one command as input to another.
+
+### 📌 Pipes (|)
+
+```bash
+ls -l | grep "txt"  # Find all text files
+cat file.txt | wc -l  # Count lines in a file
+```
+
+```bash
+ls -l / | tail -n1  # Display the last line of the directory listing
+```
+
+---
+
+Each process in the pipeline has three streams:
+
+- `STDIN`: Standard input (keyboard input by default)
+
+- `STDOUT`: Standard output (typically the terminal)
+
+- `STDERR`: Standard error output for error messages
+
+📌 Redirecting Input and Output
+
+Modify how input and output are handled with redirection:
+```bash
+a > foo   # Redirects STDOUT of `a` to file `foo`
+a 2> foo  # Redirects STDERR of `a` to file `foo`
+a < foo   # Reads input for `a` from file `foo`
+```
+
+📌 Redirecting Output to `/dev/null`
+
+In Unix-like systems, `/dev/null` is a special file that acts as a `"black hole"`. Any data written to it is discarded, making it useful for suppressing unwanted output.
+
+To discard standard output (`STDOUT`):
+```bash
+command > /dev/null
+```
+
+To discard standard error (`STDERR`):
+```bash
+command 2> /dev/null
+```
+
+To discard both `STDOUT` and `STDERR`:
+```bash
+command > /dev/null 2>&1
+```
+Examples:
+
+- `echo "This will not be displayed" > /dev/null`
+- `ls nonexistent_file 2> /dev/null  # Suppresses error message`
+- `find / -name "file.txt" > /dev/null 2>&1  # Suppresses all output`
+
+Using `/dev/null` is helpful when running scripts where you want to ignore unnecessary output but still ensure execution.
+
+---
+
+📌 Searching for Specific Entries
+```bash
+ls | grep foo   # List files containing 'foo' in their name
+ps | grep foo   # Show running processes containing 'foo'
 ```
 
 ## 📚 More Resources:

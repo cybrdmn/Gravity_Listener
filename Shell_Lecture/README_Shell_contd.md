@@ -21,9 +21,8 @@ echo '$foo'  # Outputs: $foo (literal string, no substitution)
 ```
 
 ```bash
-#!/bin/bash
-NAME="User"
-echo "Hello, $NAME!"
+echo "Value is $foo" # Outputs: Value is bar
+echo 'Value is $foo' # Outputs: Value is $foo
 ```
 
 ### 📝 Variable Expansion
@@ -350,75 +349,6 @@ diff <(journalctl -b -1 | head -n20) <(journalctl -b -2 | head -n20)
 
 Write a script that counts the number of files in a directory using `$(ls | wc -l)` and prints the result.
 
----
-
-## 🔗 Connecting Programs
-
-Shell allows chaining commands to process data efficiently. Pipes allow chaining commands together by passing the output of one command as input to another.
-
-### 📌 Pipes (|)
-
-```bash
-ls -l | grep "txt"  # Find all text files
-cat file.txt | wc -l  # Count lines in a file
-```
-
-```bash
-ls -l / | tail -n1  # Display the last line of the directory listing
-```
-
----
-
-Each process in the pipeline has three streams:
-
-- `STDIN`: Standard input (keyboard input by default)
-
-- `STDOUT`: Standard output (typically the terminal)
-
-- `STDERR`: Standard error output for error messages
-
-📌 Redirecting Input and Output
-
-Modify how input and output are handled with redirection:
-```bash
-a > foo   # Redirects STDOUT of `a` to file `foo`
-a 2> foo  # Redirects STDERR of `a` to file `foo`
-a < foo   # Reads input for `a` from file `foo`
-```
-
-📌 Redirecting Output to `/dev/null`
-
-In Unix-like systems, `/dev/null` is a special file that acts as a `"black hole"`. Any data written to it is discarded, making it useful for suppressing unwanted output.
-
-To discard standard output (`STDOUT`):
-```bash
-command > /dev/null
-```
-
-To discard standard error (`STDERR`):
-```bash
-command 2> /dev/null
-```
-
-To discard both `STDOUT` and `STDERR`:
-```bash
-command > /dev/null 2>&1
-```
-Examples:
-
-- `echo "This will not be displayed" > /dev/null`
-- `ls nonexistent_file 2> /dev/null  # Suppresses error message`
-- `find / -name "file.txt" > /dev/null 2>&1  # Suppresses all output`
-
-Using `/dev/null` is helpful when running scripts where you want to ignore unnecessary output but still ensure execution.
-
----
-
-📌 Searching for Specific Entries
-```bash
-ls | grep foo   # List files containing 'foo' in their name
-ps | grep foo   # Show running processes containing 'foo'
-```
 ---
 
 ## 🔹 Functions in Zsh

@@ -203,13 +203,14 @@ This command will display information about how to use the `man` command itself.
 
 ## 🧹 Clearing and Exiting the Terminal
 
+### 🧼 Clearing the Screen
 When using the command line, it's often useful to clear the screen to remove clutter and keep your terminal organized. You can do this using the `clear` command:
 ```bash
 clear
 ```
 A convenient shortcut for this action is pressing `Ctrl + L`.
 
-## 🔚 Exiting the Terminal
+### 🔚 Exiting the Terminal
 
 When you are done using a terminal session, you can exit the terminal window or tab using the `exit` command:
 ```bash
@@ -474,6 +475,48 @@ Hidden files are often used to store configuration settings. For example, `.giti
 
 - List all files (including hidden ones) by reverse modification time in long format.
 
+## 🔍 Finding Files
+
+While `ls` is useful for listing files in a specific directory, the `find` command allows you to search for files and directories recursively based on criteria like name, type, and modification time.
+
+The basic syntax is `find [path] [expression]`.
+
+### Common `find` Examples
+
+*   **Find files by name:**
+    This command searches for files named `sonnet_1.txt` starting from the current directory (`.`).
+
+    ```bash
+    find . -name "sonnet_1.txt"
+    # ./sonnet_1.txt
+    ```
+
+*   **Find files using wildcards:**
+    You can use wildcards to find files matching a pattern. Remember to quote the pattern to prevent the shell from expanding it.
+
+    ```bash
+    find . -name "*.txt"
+    ```
+
+*   **Find files by type:**
+    You can limit your search to only files (`f`) or directories (`d`).
+
+    ```bash
+    # Find all directories
+    find . -type d
+
+    # Find all files
+    find . -type f
+    ```
+
+*   **Executing commands on found files:**
+    The `-exec` option lets you run a command on each file found. The `{}` is a placeholder for the file path, and `\;` marks the end of the command.
+
+    ```bash
+    # Find all .txt files and delete them
+    find . -name "*.txt" -exec rm {} \;
+    ```
+    **Warning:** Be very careful when using `-exec` with `rm`, as it can permanently delete many files.
 
 
 ## ✏️ Renaming Files with `mv`

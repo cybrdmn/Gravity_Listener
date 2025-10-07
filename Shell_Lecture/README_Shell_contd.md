@@ -1,5 +1,68 @@
-
 # Advanced Topics
+
+
+## Aliases
+It can become tiresome typing long commands that involve many flags or verbose options. For this reason, most shells support **aliasing**. A shell alias is a short form for another command that your shell will replace automatically for you.
+
+For instance, an alias in `zsh` has the following structure:
+
+```bash
+alias alias_name="command_to_alias arg1 arg2"
+```
+> **Note:** There is no space around the equal sign `=`, because `alias` is a shell command that takes a single argument.
+
+Aliases have many convenient features:
+
+- **Make shorthands for common flags:**
+  ```bash
+  alias ll="ls -lh"
+  ```
+
+- **Save a lot of typing for common commands:**
+  ```bash
+  alias gs="git status"
+  alias gc="git commit"
+  alias v="vim"
+  ```
+
+- **Save you from mistyping:**
+  ```bash
+  alias sl=ls
+  ```
+
+- **Overwrite existing commands for better defaults:**
+  ```bash
+  alias mv="mv -i"       # -i prompts before overwrite
+  alias mkdir="mkdir -p" # -p make parent dirs as needed
+  alias df="df -h"       # -h prints human readable format
+  ```
+
+- **Aliases can be composed:**
+  ```bash
+  alias la="ls -A"
+  alias lla="la -l"
+  ```
+
+### Managing Aliases
+
+- **To ignore an alias**, run it prepended with `\`:
+  ```bash
+  \ls
+  ```
+
+- **To disable an alias altogether**, use `unalias`:
+  ```bash
+  unalias la
+  ```
+
+- **To get an alias definition**, just call `alias` with the alias name:
+  ```bash
+  alias ll
+  # Will print ll='ls -lh'
+  ```
+
+> **Note:** Aliases do not persist shell sessions by default. To make an alias persistent you need to include it in shell startup files, like `.bashrc` or `.zshrc`.
+
 
 
 ## 📌 Introduction to Z Shell Scripting

@@ -1,80 +1,5 @@
 # Shell Continued
 
----
-
-## 🌐 Basic Networking Commands
-
-The shell provides powerful tools for interacting with networks and the internet. These commands are essential for testing connectivity, downloading files, and accessing remote systems.
-
-### `ping`
-The `ping` command is used to test the reachability of a host on an Internet Protocol (IP) network. It sends ICMP ECHO_REQUEST packets to the target host and waits for an ICMP ECHO_RESPONSE.
-
-**Usage:**
-```bash
-ping google.com
-```
-This will continuously send packets to `google.com`. You can stop it with `Ctrl+C`. To send a specific number of packets, use the `-c` flag:
-```bash
-ping -c 5 google.com  # Sends 5 packets
-```
-
-### `curl`
-`curl` is a versatile tool to transfer data from or to a server, using any of the supported protocols (HTTP, FTP, IMAP, etc.). It is often used for testing APIs or downloading content.
-
-**Examples:**
-- **Fetch the content of a webpage:**
-  ```bash
-  curl https://www.example.com
-  ```
-
-- **Download a file:**
-  ```bash
-  curl -O https://www.example.com/file.zip
-  ```
-  The `-O` flag saves the file with its original name.
-
-- **Make a POST request with JSON data:**
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"key":"value"}' https://api.example.com/submit
-  ```
-
-### `wget`
-`wget` is a free utility for non-interactive download of files from the web. It supports HTTP, HTTPS, and FTP protocols, as well as retrieval through HTTP proxies. It can resume aborted downloads, and recursively download websites.
-
-**Examples:**
-- **Download a file:**
-  ```bash
-  wget https://www.example.com/file.zip
-  ```
-
-- **Download and save with a different name:**
-  ```bash
-  wget -O new_name.zip https://www.example.com/file.zip
-  ```
-
-- **Recursively download a website (be careful with this):**
-  ```bash
-  wget --recursive --no-parent https://www.example.com
-  ```
-
-### `ssh`
-The `ssh` (Secure Shell) command is a protocol used to securely log onto remote systems. It provides a secure channel over an unsecured network in a client-server architecture.
-
-**Usage:**
-```bash
-ssh username@remote_host
-```
-For example, to connect to a server with the IP `192.168.1.100` as user `admin`:
-```bash
-ssh admin@192.168.1.100
-```
-You can also run commands directly on the remote server:
-```bash
-ssh username@remote_host "ls -l"
-```
-
----
-
 ## Aliases
 It can become tiresome typing long commands that involve many flags or verbose options. For this reason, most shells support **aliasing**. A shell alias is a short form for another command that your shell will replace automatically for you.
 
@@ -206,3 +131,77 @@ After editing your startup file, you need to apply the changes. You can do this 
 ```bash
 source ~/.zshrc
 ```
+
+---
+
+## 🌐 Basic Networking Commands
+
+The shell provides powerful tools for interacting with networks and the internet. These commands are essential for testing connectivity, downloading files, and accessing remote systems.
+
+### `ping`
+The `ping` command is used to test the reachability of a host on an Internet Protocol (IP) network. It sends ICMP ECHO_REQUEST packets to the target host and waits for an ICMP ECHO_RESPONSE.
+
+**Usage:**
+```bash
+ping google.com
+```
+This will continuously send packets to `google.com`. You can stop it with `Ctrl+C`. To send a specific number of packets, use the `-c` flag:
+```bash
+ping -c 5 google.com  # Sends 5 packets
+```
+
+### `curl`
+`curl` is a versatile tool to transfer data from or to a server, using any of the supported protocols (HTTP, FTP, IMAP, etc.). It is often used for testing APIs or downloading content.
+
+**Examples:**
+- **Fetch the content of a webpage:**
+  ```bash
+  curl https://www.example.com
+  ```
+
+- **Download a file:**
+  ```bash
+  curl -O https://www.example.com/file.zip
+  ```
+  The `-O` flag saves the file with its original name.
+
+- **Make a POST request with JSON data:**
+  ```bash
+  curl -X POST -H "Content-Type: application/json" -d '{"key":"value"}' https://api.example.com/submit
+  ```
+
+### `wget`
+`wget` is a free utility for non-interactive download of files from the web. It supports HTTP, HTTPS, and FTP protocols, as well as retrieval through HTTP proxies. It can resume aborted downloads, and recursively download websites.
+
+**Examples:**
+- **Download a file:**
+  ```bash
+  wget https://www.example.com/file.zip
+  ```
+
+- **Download and save with a different name:**
+  ```bash
+  wget -O new_name.zip https://www.example.com/file.zip
+  ```
+
+- **Recursively download a website (be careful with this):**
+  ```bash
+  wget --recursive --no-parent https://www.example.com
+  ```
+
+### `ssh`
+The `ssh` (Secure Shell) command is a protocol used to securely log onto remote systems. It provides a secure channel over an unsecured network in a client-server architecture.
+
+**Usage:**
+```bash
+ssh username@remote_host
+```
+For example, to connect to a server with the IP `192.168.1.100` as user `admin`:
+```bash
+ssh admin@192.168.1.100
+```
+You can also run commands directly on the remote server:
+```bash
+ssh username@remote_host "ls -l"
+```
+---

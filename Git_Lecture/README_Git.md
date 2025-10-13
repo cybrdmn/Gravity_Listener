@@ -265,7 +265,9 @@ Here are some other interesting options for viewing history:
 
 ```bash
 git log --oneline --max-count=2
-git log --oneline --since="5 minutes ago" git log --oneline --until="5 minutes ago" git log --oneline --author="Your Name"
+git log --oneline --since="5 minutes ago" 
+git log --oneline --until="5 minutes ago" 
+git log --oneline --author="Your Name"
 git log --oneline --all
 ```
 
@@ -274,13 +276,13 @@ git log --oneline --all
 This is what I use to review the changes made within the last week. I will add `--author=        ` if I want to see only the changes made by me.
 
 ```bash
-git log --all --pretty=format: "%h %cd %s (%an)" --since="7 days ago"
+git log --all --pretty=format:"%h %cd %s (%an)" --since="7 days ago"
 ```
 
 Run:
 
 ```bash
-git log --pretty=format: "%h %ad | %s%d [%an]" --date=short
+git log --pretty=format:"%h %ad | %s%d [%an]" --date=short
 ```
 
 Let's look at it in detail:
@@ -672,59 +674,6 @@ git log
 ```
 
 The new "author/email" commit replaces the original "author" commit. The same effect can be achieved by resetting the last commit in the branch, and recommitting new changes.
-
-## Git Test
-
-### Option 1
-
-As a Test for the Topic Git, we expect you to go through the game <span style="color: green; font-weight: bold;">Oh-my-Git</span> successfully, i.e. all the different levels/sections should be marked as a green/passed.
-
-Please send me your printscreens of finished Games ;)
-
-URL: https://ohmygit.org/
-
-![Oh-my-Git](./pics/oh-my-git.png)
-
-### Option 2
-
-Alternatively, you can play another game <span style="color: green; font-weight: bold;">LearnGitBranching</span>.
-
-Here, as well please send me your printscreens
-of finished games with green check marks ;)
-
-URL: https://learngitbranching.js.org/
-
-![LearnGitBranching](./pics/learngitbranching.png)
-
-## Summary of Commands
-
-### Setting Up and Configuring
-
-<img src="./pics/setting-up-and-configuring.png" alt="Setup and configuration commands" width="800"/>
-
-### Managing Files and Staging
-
-<img src="./pics/managing-files-and-staging.png" alt="Management and Staging" width="800"/>
-
-### Branching and Merging
-
-<img src="./pics/branching-and-merging.png" alt="Branching and Merging" width="800"/>
-
-### Committing Changes
-
-<img src="./pics/committing-changes.png" alt="Comitting Changes" width="800"/>
-
-### Advanced Branching and Merging
-
-<img src="./pics/advanced-branching-and-merging.png" alt="Advanced Branching and Merging" width="800"/>
-
-### Undoing changes and Cleaning-up
-
-<img src="./pics/undoing-changes-and-cleaning-up.png" alt="Undoing changes and Cleaning-up" width="800"/>
-
-### Remote repositories and Pushing changes
-
-<img src="./pics/remote-repositories-and-pushing-changes.png" alt="Remote repositories and Pushing changes" width="800"/>
 
 ## Self-study Materials
 

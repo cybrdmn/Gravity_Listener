@@ -80,7 +80,7 @@ git commit -m "Included stylesheet into hello.html"
 Now our project has two branches:
 
 ```bash
-git log --all
+git branch
 ```
 
 ### Switching to the `main` branch
@@ -189,14 +189,33 @@ As I mentioned previously, Git lets you work with several branches at the same t
 team because people can work on different features in parallel. It is also useful when working solo: while developing
 features in separate branches, you can still fix bugs and release minor updates using stable code in the `main` branch.
 
-### Commit the `README` file to the `main` branch
+### Create the `README` file
 
-We are currently in the `style` branch. The `README` file is not part of this branch, so we must switch to the `main` branch before committing the changes:
+We are currently in the `style` branch. The `README` file is not part of this branch, so we must switch to the `main` branch before creating and committing it:
 
 ```bash
 git switch main
+```
+
+Now let's create a README file for our project:
+
+```bash
+touch README
+```
+
+Add the following content to the `README` file:
+
+```
+This is the Hello World example from the Git tutorial.
+```
+
+### Commit the `README` file to the `main` branch
+
+Now we can stage and commit the file:
+
+```bash
 git add README
-git commit -m “"Added README"
+git commit -m "Added README"
 ```
 
 ## Viewing diverging branches
@@ -298,7 +317,7 @@ Let us return to the `style` branch and merge in all the recent changes from the
 
 ```bash
 git switch style
-git merge mailn
+git merge main
 ```
 
 It seems that we have a conflict. No surprise here! Let us see what Git has to say about it:
@@ -771,7 +790,7 @@ to it.
 ```bash
 cd ..
 git clone --bare work work.git
-1s work.git
+ls work.git
 ```
 
 The convention is that repositories ending in `.git` are bare repositories. We can see that there is no working directory in

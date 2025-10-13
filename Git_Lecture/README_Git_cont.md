@@ -530,7 +530,7 @@ Given the above recommendations, I prefer to use `rebase` for short-term, local 
 
 <strong>Goals</strong>
 
-- We have kept our `style` branch up to date with the `main` branch (using `rebase`), but now let's merge the `style` branch changes back into the main.
+- We have kept our `style` branch up to date with the `main` branch (using `rebase`), but now let's merge the `style` branch changes back into main.
 
 ### Merge `style` into `main`
 

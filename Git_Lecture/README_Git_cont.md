@@ -1044,8 +1044,6 @@ git commit -m "Stop tracking PDFs with LFS"
 
 As a Test for the Topic Git, we expect you to go through the game <span style="color: green; font-weight: bold;">Oh-my-Git</span> successfully, i.e. all the different levels/sections should be marked as a green/passed.
 
-Please send me your printscreens of finished Games ;)
-
 URL: https://ohmygit.org/
 
 ![Oh-my-Git](./pics/oh-my-git.png)

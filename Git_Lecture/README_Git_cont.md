@@ -884,6 +884,160 @@ enjoy your private GitHub!
 
 Seriously, though, you can host your own private GitLab. It's free and open source.
 
+## Git Large File Storage (LFS)
+
+<strong>Goals</strong>
+
+- Learn when and how to use Git LFS for large files.
+- Understand the difference between regular Git tracking and LFS.
+- Learn best practices for managing large binary files in Git repositories.
+
+### What is Git LFS?
+
+Git Large File Storage (LFS) is an extension that replaces large files in your repository with tiny pointer files, while storing the actual file contents on a remote server. This keeps your repository lightweight and fast while still providing version control for large assets.
+
+Without LFS, every clone of your repository downloads the entire history of every large file, which can make repositories slow and unwieldy. LFS solves this by only downloading the large files you actually need.
+
+### Installing Git LFS
+
+On macOS, you can install Git LFS using Homebrew:
+
+```bash
+# Install Git LFS
+brew install git-lfs
+
+# Initialize Git LFS for your user account (one-time setup)
+git lfs install
+```
+
+For other operating systems:
+- **Windows**: Download from https://git-lfs.github.com/
+- **Linux**: Use your package manager (e.g., `apt-get install git-lfs`)
+
+### Tracking Files with LFS
+
+Once installed, you need to tell Git LFS which files to track. This is done using the `git lfs track` command:
+
+```bash
+# Track all PDF files
+git lfs track "*.pdf"
+
+# Track all video files
+git lfs track "*.mp4"
+git lfs track "*.mov"
+
+# Track all files in a specific directory
+git lfs track "datasets/**"
+
+# Track specific large binary files
+git lfs track "*.psd"
+git lfs track "*.zip"
+```
+
+When you run `git lfs track`, it creates or updates a `.gitattributes` file in your repository. This file must be committed to Git:
+
+```bash
+git add .gitattributes
+git commit -m "Configure Git LFS tracking"
+```
+
+### Working with LFS Files
+
+Once LFS is configured, you work with tracked files just like any other Git files:
+
+```bash
+# Add a large file (it will automatically be handled by LFS)
+git add large-dataset.csv
+git commit -m "Add dataset"
+git push
+```
+
+Git LFS intercepts the add/commit/push operations and handles large files transparently.
+
+### Viewing LFS Status
+
+To see which files are managed by LFS:
+
+```bash
+# List all files tracked by LFS in the current repository
+git lfs ls-files
+
+# Check LFS status
+git lfs status
+
+# See which patterns are being tracked
+git lfs track
+```
+
+### Cloning Repositories with LFS
+
+When cloning a repository that uses LFS:
+
+```bash
+# Clone normally - LFS files will be downloaded automatically
+git clone <repository-url>
+
+# If you want to clone without downloading LFS files immediately
+GIT_LFS_SKIP_SMUDGE=1 git clone <repository-url>
+
+# Later, you can fetch LFS files when needed
+git lfs pull
+```
+
+### Migrating Existing Files to LFS
+
+If you already have large files in your repository history, you can migrate them to LFS:
+
+```bash
+# Migrate all PDF files from the entire history
+git lfs migrate import --include="*.pdf"
+
+# Migrate specific files
+git lfs migrate import --include="large-file.zip"
+```
+
+> ⚠️ <strong>Warning</strong> <br>
+> Migration rewrites Git history. Make sure to coordinate with your team before running this command on a shared repository.
+
+### When to Use Git LFS
+
+**Use LFS for:**
+- Binary files larger than 100MB
+- Machine learning models and datasets
+- Video, audio, and high-resolution image files
+- Compiled binaries and executables
+- Design files (PSD, AI, Sketch files)
+- Archives (ZIP, TAR.GZ files)
+- Any frequently updated binary files
+
+**Don't use LFS for:**
+- Text files (source code, markdown, configs)
+- Small images and assets (< 1MB)
+- Files that compress well and change frequently
+- Files that need to be diffed
+
+### Removing Files from LFS
+
+If you no longer want to track a file pattern:
+
+```bash
+# Untrack a pattern
+git lfs untrack "*.pdf"
+
+# Don't forget to commit the updated .gitattributes
+git add .gitattributes
+git commit -m "Stop tracking PDFs with LFS"
+```
+
+### Best Practices
+
+1. **Track early**: Set up LFS tracking before adding large files to your repository.
+2. **Use patterns**: Track entire file types (e.g., `*.psd`) rather than individual files.
+3. **Commit .gitattributes**: Always commit your `.gitattributes` file so others benefit from LFS.
+4. **Document usage**: Add a note in your README about which files are tracked by LFS.
+5. **Monitor storage**: Keep an eye on your LFS storage usage to avoid surprise charges.
+6. **Avoid rewriting history**: Once files are in LFS, avoid force-pushing or rebasing when possible.
+
 ## Git Test
 
 ### Option 1

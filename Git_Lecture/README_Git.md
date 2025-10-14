@@ -675,6 +675,172 @@ git log
 
 The new "author/email" commit replaces the original "author" commit. The same effect can be achieved by resetting the last commit in the branch, and recommitting new changes.
 
+
+
+## Ignoring Files with `.gitignore`
+
+<strong>Goals</strong>
+
+- Learn how to tell Git to ignore certain files.
+- Understand when and why to use `.gitignore`.
+- Learn to create and manage `.gitignore` files.
+
+### What is `.gitignore`?
+
+Not all files in your project directory should be tracked by Git. Some files are generated automatically (like build artifacts or compiled code), some contain sensitive information (like passwords or API keys), and some are specific to your development environment (like IDE settings). The `.gitignore` file tells Git which files or directories to ignore and not track.
+
+### Why use `.gitignore`?
+
+**You should ignore:**
+
+- **Build outputs**: Compiled code, distribution folders (`dist/`, `build/`, `*.class`, `*.o`)
+- **Dependencies**: Third-party libraries that can be downloaded (`node_modules/`, `venv/`, `__pycache__/`)
+- **Environment files**: Files containing secrets (`.env`, `config.local.js`, `secrets.yml`)
+- **IDE/Editor files**: Personal editor settings (`.vscode/`, `.idea/`, `*.swp`, `.DS_Store`)
+- **Log files**: Application logs (`*.log`, `logs/`)
+- **Temporary files**: OS or application temporary files (`.tmp`, `*.cache`)
+
+### Creating a `.gitignore` file
+
+Let's create a `.gitignore` file in our project. In your `work` directory, create the file:
+
+```bash
+touch .gitignore
+```
+
+### Example: Ignoring log files
+
+Let's see `.gitignore` in action. First, create a log file:
+
+```bash
+echo "Application log data" > app.log
+git status
+```
+
+You'll see that Git detects both `.gitignore` and `app.log` as untracked files.
+
+Now, edit `.gitignore` and add the following line:
+
+```
+*.log
+```
+
+This pattern tells Git to ignore all files ending with `.log`. Check the status again:
+
+```bash
+git status
+```
+
+Notice that `app.log` is no longer listed as an untracked file! Only `.gitignore` appears.
+
+### Commit the `.gitignore` file
+
+The `.gitignore` file itself should be tracked by Git so that everyone working on the project uses the same ignore rules:
+
+```bash
+git add .gitignore
+git commit -m "Add gitignore file"
+```
+
+### Common `.gitignore` patterns
+
+Here are some common patterns you'll use in `.gitignore` files:
+
+```
+# Ignore specific file
+secrets.txt
+
+# Ignore all files with .log extension
+*.log
+
+# Ignore entire directory
+node_modules/
+__pycache__/
+
+# Ignore files in any directory
+**/temp
+
+# Ignore files only in root directory
+/config.local.js
+
+# Ignore all .txt files except important.txt
+*.txt
+!important.txt
+
+# Ignore all files in build directory
+build/*
+
+# Ignore .env files
+.env
+.env.local
+.env.*.local
+```
+
+### Pattern matching rules
+
+- `*` matches any string of characters (except `/`)
+- `?` matches any single character
+- `**` matches any number of directories
+- `!` negates a pattern (includes files that would otherwise be ignored)
+- Lines starting with `#` are comments
+- Blank lines are ignored
+
+### Example: A more complete `.gitignore`
+
+Here's what a typical `.gitignore` might look like for a Python project:
+
+```
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+.env
+data/output/
+```
+
+### Already tracked files
+
+> ⚠️ <strong>Important</strong> <br>
+> `.gitignore` only affects untracked files. If you've already committed a file to your repository, adding it to `.gitignore` won't remove it from Git's tracking.
+
+If you need to stop tracking a file that's already been committed:
+
+```bash
+# Remove from Git but keep the file locally
+git rm --cached filename
+
+# Remove an entire directory from Git
+git rm --cached -r directory/
+
+# Commit the removal
+git commit -m "Stop tracking ignored files"
+```
+
+### Finding `.gitignore` templates
+
+GitHub provides a collection of useful `.gitignore` templates for different languages and frameworks at:
+https://github.com/github/gitignore
+
+You can use these as starting points for your projects.
+
 ## Self-study Materials
 
 - https://www.youtube.com/watch?v=DVRQoVRzMIY

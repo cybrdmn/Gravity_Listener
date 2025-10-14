@@ -884,6 +884,38 @@ enjoy your private GitHub!
 
 Seriously, though, you can host your own private GitLab. It's free and open source.
 
+## Forking Repositories
+
+**Goals**
+
+- Learn what forking is and when to use it.
+- Understand the difference between cloning and forking.
+- Learn the fork-and-pull workflow.
+
+### What is Forking?
+
+Forking creates a personal copy of someone else's repository on your GitHub/GitLab account. Unlike cloning (which creates a local copy), forking creates a server-side copy that remains connected to the original repository.
+
+### When to Fork
+
+**Use forking when:**
+- Contributing to open-source projects where you don't have write access
+- Experimenting with changes without affecting the original project
+- Creating your own version of a project to develop independently
+
+**Don't fork when:**
+- You have write access to the repository (use branches instead)
+- Working on private team repositories (use branches instead)
+
+### The Fork Workflow
+
+1. Fork the repository on GitHub/GitLab
+2. Clone your fork locally
+3. Create a feature branch
+4. Make changes and commit
+5. Push to your fork
+6. Create a Pull Request to the original repository
+
 ## Git Large File Storage (LFS)
 
 <strong>Goals</strong>

@@ -241,6 +241,7 @@ Notice we use `python:3.11-slim` instead of just `python:3.11`. Here's why:
 
 Always use `-slim` images unless you have a specific reason not to!
 
+
 ### Step 3: Build the Image
 
 ```bash
@@ -258,6 +259,55 @@ docker run -it my-python-app
 ```
 
 Congratulations! You've built and run your first Docker image.
+
+### 💡 Building for Different Operating Systems and Architectures
+
+Docker images can be built for different platforms (operating systems and CPU architectures). This is increasingly important because:
+
+**Why cross-platform builds matter:**
+- 🍎 **Apple Silicon Macs** (M1, M2, M3, M4) use ARM64 architecture
+- 💻 **Most Intel/AMD computers** use AMD64 (x86_64) architecture
+- ☁️ **Cloud servers** might use different architectures than your laptop
+- 🤝 **Team collaboration**: Your teammates might have different machines
+
+**The problem:**
+If you build an image on your Mac M1 (ARM64), it might not run on your colleague's Intel laptop (AMD64) or on your production server!
+
+**Example scenario:**
+```bash
+# You build on Mac M1
+docker build -t my-app .
+
+# Your teammate on Intel Mac tries to run it
+docker run my-app
+# Warning: The requested image's platform (linux/arm64) does not match
+# the detected host platform (linux/amd64)
+```
+
+**Solution: Multi-platform builds**
+
+Docker Buildx allows building for multiple platforms at once:
+
+```bash
+# Build for both ARM64 and AMD64
+docker buildx build --platform linux/amd64,linux/arm64 -t my-app .
+
+# Or build for a specific platform
+docker buildx build --platform linux/amd64 -t my-app .
+```
+
+**Common platforms:**
+- `linux/amd64` - Intel/AMD processors (most servers and older Macs)
+- `linux/arm64` - Apple Silicon Macs, some cloud instances
+- `linux/arm/v7` - Raspberry Pi and other ARM devices
+
+**When do you need this?**
+- ✅ **Sharing images** with teammates on different machines
+- ✅ **Deploying to cloud** servers with different architectures
+- ✅ **Publishing to Docker Hub** for others to use
+- ✅ **Working on Apple Silicon** but deploying to AMD64 servers
+
+
 
 ## Part 5: A More Realistic Example - Web API
 
@@ -333,6 +383,146 @@ CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
   - To actually access the port, you must use the `-p` flag when running the container
   - Think of it as a note saying "this app expects to use port 8000"
 - `CMD`: Uses uvicorn (ASGI server) to run FastAPI
+
+### 💡 Understanding CMD vs ENTRYPOINT
+
+Both `CMD` and `ENTRYPOINT` define what command runs when a container starts, but they work differently. Understanding this helps you create more flexible containers.
+
+**CMD - The Default Command (Easy to Override)**
+
+`CMD` provides default arguments that can be **easily overridden** when you run the container:
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY app.py .
+CMD ["python", "app.py"]
+```
+
+```bash
+# Runs python app.py (uses CMD)
+docker run my-app
+
+# Override CMD - runs bash instead
+docker run -it my-app bash
+
+# Override CMD - runs a different script
+docker run my-app python another_script.py
+```
+
+**ENTRYPOINT - The Fixed Command (Harder to Override)**
+
+`ENTRYPOINT` sets a **fixed command** that will always run. Arguments you pass become additional parameters:
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY app.py .
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+```
+
+```bash
+# Runs: python app.py
+docker run my-app
+
+# Runs: python another_script.py (CMD is overridden)
+docker run my-app another_script.py
+
+# To override ENTRYPOINT, you need --entrypoint flag
+docker run --entrypoint bash my-app
+```
+
+**When to Use What?**
+
+| Use Case | Instruction | Example |
+|----------|-------------|---------|
+| **Application container** (one purpose) | `ENTRYPOINT` | Web server, database |
+| **Flexible container** (multiple uses) | `CMD` | Development image, utilities |
+| **Best of both** | `ENTRYPOINT` + `CMD` | ENTRYPOINT=command, CMD=default args |
+
+**Example 1: Web Server (Use ENTRYPOINT)**
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+
+# ENTRYPOINT ensures uvicorn always runs
+# CMD provides default arguments that can be overridden
+ENTRYPOINT ["uvicorn"]
+CMD ["app:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+```bash
+# Runs: uvicorn app:app --host 0.0.0.0 --port 8000
+docker run my-app
+
+# Runs: uvicorn app:app --host 0.0.0.0 --port 8080 --reload
+# (Overrides CMD with different port and reload flag)
+docker run my-app app:app --host 0.0.0.0 --port 8080 --reload
+```
+
+**Example 2: Utility Container (Use CMD)**
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY . .
+
+# CMD makes it easy to run different things
+CMD ["python", "--version"]
+```
+
+```bash
+# Runs: python --version
+docker run my-app
+
+# Runs: python my_script.py (completely overrides CMD)
+docker run my-app python my_script.py
+
+# Runs: bash (for debugging)
+docker run -it my-app bash
+```
+
+**Example 3: CLI Tool (Use ENTRYPOINT + CMD)**
+```dockerfile
+FROM alpine:latest
+
+# Install a tool (e.g., curl)
+RUN apk add --no-cache curl
+
+# ENTRYPOINT sets the main command
+ENTRYPOINT ["curl"]
+
+# CMD provides default flags
+CMD ["--help"]
+```
+
+```bash
+# Runs: curl --help
+docker run my-curl
+
+# Runs: curl https://example.com
+docker run my-curl https://example.com
+
+# Runs: curl -I https://example.com (get headers only)
+docker run my-curl -I https://example.com
+```
+
+**Key Differences Summary:**
+
+| Feature | CMD | ENTRYPOINT |
+|---------|-----|------------|
+| **Purpose** | Default command/args | Main executable |
+| **Override** | Easy (`docker run image <command>`) | Requires `--entrypoint` flag |
+| **Best for** | Flexible containers | Single-purpose containers |
+| **Combined** | Provides default args to ENTRYPOINT | Sets the main command |
+
+**Pro Tip:** Many production images use both:
+- `ENTRYPOINT` = the program that should always run
+- `CMD` = default arguments that users can easily override
+
+This pattern gives you the best of both worlds: a clear purpose with flexibility!
 
 ### Step 3: Build and Run
 
@@ -649,732 +839,3 @@ docker network rm test-network
 - Create **custom networks** for better isolation
 
 ---
-
-## Part 8: Docker Compose - Putting It All Together
-
-You've learned about volumes (Part 6) and networks (Part 7). Now, instead of typing long `docker run` commands with all those flags, let's use **Docker Compose** to manage everything in one simple file!
-
-### The Problem Without Docker Compose
-
-Remember our web app + database example from Part 7? We had to type:
-
-```bash
-docker network create app-network
-
-docker run -d \
-  --name db \
-  --network app-network \
-  -e POSTGRES_PASSWORD=secret123 \
-  -v $(pwd)/data:/var/lib/postgresql/data \
-  postgres:15-alpine
-
-docker run -d \
-  --name webapp \
-  --network app-network \
-  -p 8000:8000 \
-  -e DATABASE_HOST=db \
-  -v $(pwd):/app \
-  my-fastapi-app
-```
-
-That's a lot to remember! And if you restart your computer, you have to type it all again.
-
-### The Solution: Docker Compose
-
-Docker Compose lets you define everything in one `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-
-services:
-  webapp:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_HOST=db
-    volumes:
-      - .:/app
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_PASSWORD=secret123
-    volumes:
-      - ./data:/var/lib/postgresql/data
-```
-
-Then just run: `docker compose up -d`
-
-**That's it!** Docker Compose automatically:
-- Creates a network for your services
-- Starts containers in the right order
-- Connects everything together
-
-### Why Docker Compose?
-
-- ✅ **Simplicity**: Define all services in one file
-- ✅ **Reproducibility**: Share the file with your team
-- ✅ **Easy management**: One command to start/stop everything
-- ✅ **Automatic networking**: Services can talk to each other by name
-- ✅ **Volume management**: Persist data easily
-
-### Example 1: Simple FastAPI App with Compose
-
-Create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app  # Remember bind mounts from Part 6?
-    environment:
-      - ENVIRONMENT=development
-```
-
-**Key concepts:**
-- `services`: Defines containers to run
-- `build`: Build from Dockerfile in current directory
-- `ports`: Port mapping (same as `-p` flag from Part 5)
-- `volumes`: Bind mount from Part 6 - live code changes!
-- `environment`: Set environment variables
-
-Start the application:
-```bash
-docker compose up
-```
-
-Start in detached mode:
-```bash
-docker compose up -d
-```
-
-Stop all services:
-```bash
-docker compose down
-```
-
-View logs:
-```bash
-docker compose logs -f
-```
-
-### Example 2: FastAPI with PostgreSQL Database
-
-Let's create a more realistic application with a database.
-
-**app.py** (updated)
-```python
-from fastapi import FastAPI
-import os
-
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    db_host = os.getenv("DATABASE_HOST", "not configured")
-    return {
-        "message": "Hello from Docker Compose!",
-        "database": db_host
-    }
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
-```
-
-**docker-compose.yml**
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-    depends_on:
-      - db
-    volumes:
-      - .:/app
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=mydb
-    volumes:
-      - ./data:/var/lib/postgresql/data  # Database files stored in ./data folder
-    ports:
-      - "5432:5432"
-
-```
-
-**New concepts from Parts 6 & 7 in action:**
-- `volumes`: Bind mount from Part 6 - database data persists!
-- `depends_on`: Ensures database starts before web service
-- **Automatic networking**: Services can use each other's names as hostnames (remember Part 7?)
-  - The web service connects to `DATABASE_HOST=db` - that's the container name!
-  - Docker Compose creates a network automatically - no `docker network create` needed!
-
-Start everything:
-```bash
-docker compose up -d
-```
-
-Check status:
-```bash
-docker compose ps
-```
-
-Access web service: `http://localhost:8000`
-
-Stop and remove everything (including volumes):
-```bash
-docker compose down -v
-```
-
-### Example 3: Complete Application Stack
-
-**docker-compose.yml** (full stack)
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydb
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - .:/app
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=mydb
-    volumes:
-      - ./data:/var/lib/postgresql/data  # Database files stored in ./data folder
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-
-```
-
-This creates:
-- FastAPI web application
-- PostgreSQL database
-- Redis cache
-- All connected via Docker network
-
-### Useful Docker Compose Commands
-
-| Command | Description |
-|---------|-------------|
-| `docker compose up` | Start all services |
-| `docker compose up -d` | Start in background |
-| `docker compose down` | Stop and remove containers |
-| `docker compose down -v` | Stop and remove containers + volumes |
-| `docker compose ps` | List services |
-| `docker compose logs` | View logs |
-| `docker compose logs -f web` | Follow logs for specific service |
-| `docker compose exec web bash` | Execute command in running service |
-| `docker compose build` | Build/rebuild services |
-| `docker compose restart` | Restart services |
-
-### Development Workflow with Compose
-
-1. **Start services**:
-   ```bash
-   docker compose up -d
-   ```
-
-2. **View logs**:
-   ```bash
-   docker compose logs -f web
-   ```
-
-3. **Make code changes** (with volume mounted, changes are live)
-
-4. **Restart specific service**:
-   ```bash
-   docker compose restart web
-   ```
-
-5. **Stop everything**:
-   ```bash
-   docker compose down
-   ```
-
-## Common Commands Cheat Sheet
-
-| Command | Description |
-|---------|-------------|
-| `docker run <image>` | Create and start a container |
-| `docker ps` | List running containers |
-| `docker ps -a` | List all containers |
-| `docker images` | List images |
-| `docker build -t <name> .` | Build an image |
-| `docker stop <container>` | Stop a container |
-| `docker rm <container>` | Remove a container |
-| `docker rmi <image>` | Remove an image |
-| `docker logs <container>` | View container logs |
-| `docker exec -it <container> bash` | Enter a running container |
-
-## Best Practices
-
-1. **Use Official Images**: Start with official base images from Docker Hub
-2. **Keep Images Small**: Use slim or alpine variants when possible (see Part 4 for comparison table)
-   - Smaller images = faster builds, downloads, and deployments
-   - Less disk space usage
-   - Improved security (fewer packages = fewer vulnerabilities)
-3. **One Process per Container**: Each container should have a single responsibility
-4. **Use .dockerignore**: Exclude unnecessary files (like `.git`, `node_modules`)
-5. **Don't Run as Root**: Create a non-root user in your Dockerfile for security
-6. **Layer Caching**: Order Dockerfile instructions from least to most frequently changing
-
----
-
-## Part 9: Docker Best Practices for Production
-
-### 1. Use Multi-Stage Builds
-
-Reduce image size by separating build and runtime environments.
-
-**Dockerfile (multi-stage)**
-```dockerfile
-# Build stage
-FROM python:3.11 as builder
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-# Runtime stage
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# Copy only necessary files from builder
-COPY --from=builder /root/.local /root/.local
-COPY app.py .
-
-# Make sure scripts are in PATH
-ENV PATH=/root/.local/bin:$PATH
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-**Benefits:**
-- Smaller final image
-- Faster deployment
-- More secure (no build tools in production)
-
-### 2. Keep Images Small
-
-**Why care about image size?**
-- Faster to build and deploy
-- Uses less disk space on your computer and servers
-- Faster to download for your teammates
-- Lower bandwidth costs in production
-- Better security (fewer packages = smaller attack surface)
-
-**How to keep images small:**
-- ✅ Use `-slim` base images (e.g., `python:3.11-slim` instead of `python:3.11`)
-- ✅ Use `.dockerignore` to exclude unnecessary files
-- ✅ Use multi-stage builds (see example above)
-- ✅ Remove build dependencies after installation
-- ✅ Combine RUN commands to reduce layers
-
-### 3. Use .dockerignore
-
-Create a `.dockerignore` file to exclude unnecessary files (this also makes images smaller!):
-
-```
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.git
-.gitignore
-.dockerignore
-.env
-*.md
-tests/
-.pytest_cache
-.vscode
-.idea
-*.log
-data/
-```
-
-### 4. Don't Run as Root
-
-**Dockerfile (with non-root user)**
-```dockerfile
-FROM python:3.11-slim
-
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app.py .
-
-# Change ownership
-RUN chown -R appuser:appuser /app
-
-# Switch to non-root user
-USER appuser
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### 5. Health Checks
-
-Add health checks to monitor container status:
-
-**Dockerfile**
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app.py .
-
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-**Health check parameters explained:**
-- `--interval=30s`: Check health every 30 seconds
-- `--timeout=3s`: Consider check failed if it takes longer than 3 seconds
-- `--start-period=5s`: Give the container 5 seconds to start before checking
-- `--retries=3`: Mark as unhealthy after 3 consecutive failures
-
-Check container health:
-```bash
-docker ps
-# Look for health status in output: healthy, unhealthy, or starting
-```
-
-**Health Checks in Docker Compose**
-
-You can also define health checks in your `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
-    depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_PASSWORD=secret123
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - ./data:/var/lib/postgresql/data
-```
-
-**What this does:**
-- The `web` service won't start until `db` is healthy (not just started)
-- Docker automatically runs health checks and reports status
-- Orchestration tools (like Kubernetes) can use this to restart unhealthy containers
-
-Check health status with compose:
-```bash
-docker compose ps
-# Shows health status for each service
-```
-
-### 6. Use Specific Image Tags
-
-**Bad:**
-```dockerfile
-FROM python:latest
-```
-
-**Good:**
-```dockerfile
-FROM python:3.11-slim
-```
-
-**Why?** `latest` can change, breaking your builds. Specific tags ensure reproducibility.
-
-### 7. Layer Caching Optimization
-
-Order matters! Put frequently changing instructions last:
-
-**Dockerfile (optimized)**
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# Dependencies change less frequently - install first
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Code changes frequently - copy last
-COPY . .
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### 8. Environment-Specific Configurations
-
-**docker-compose.yml (with env file)**
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15-alpine
-    env_file:
-      - .env.db
-    volumes:
-      - ./data:/var/lib/postgresql/data  # Database files stored in ./data folder
-
-```
-
-**.env**
-```
-ENVIRONMENT=production
-DATABASE_URL=postgresql://user:pass@db:5432/mydb
-SECRET_KEY=your-secret-key
-```
-
-## Part 10: Debugging and Troubleshooting Docker Issues
-
-### Inspect Running Containers
-
-```bash
-# View container details
-docker inspect <container-id>
-
-# View resource usage
-docker stats
-
-# View processes inside container
-docker top <container-id>
-```
-
-### Access Container Shell
-
-```bash
-# For running containers
-docker exec -it <container-id> bash
-
-# If bash not available (alpine images)
-docker exec -it <container-id> sh
-
-# For stopped containers (debug)
-docker run -it --entrypoint bash <image-name>
-```
-
-### View and Follow Logs
-
-```bash
-# View logs
-docker logs <container-id>
-
-# Follow logs (real-time)
-docker logs -f <container-id>
-
-# Last 100 lines
-docker logs --tail 100 <container-id>
-
-# With timestamps
-docker logs -t <container-id>
-```
-
-### Common Issues and Solutions
-
-#### Issue 1: Port Already in Use
-
-**Error:** `Bind for 0.0.0.0:8000 failed: port is already allocated`
-
-**Solution:**
-```bash
-# Find what's using the port (macOS/Linux)
-lsof -i :8000
-
-# Use different host port
-docker run -p 8080:8000 my-app
-```
-
-#### Issue 2: Container Exits Immediately
-
-**Solution:**
-```bash
-# Check logs
-docker logs <container-id>
-
-# Run interactively to see errors
-docker run -it <image-name>
-```
-
-#### Issue 3: Changes Not Reflected
-
-**Solution:**
-```bash
-# Rebuild image (no cache)
-docker build --no-cache -t my-app .
-
-# For compose
-docker compose build --no-cache
-```
-
-#### Issue 4: Permission Denied
-
-**Solution:**
-```bash
-# On Linux, add user to docker group
-sudo usermod -aG docker $USER
-
-# Log out and back in
-
-# Or run with sudo (not recommended)
-sudo docker run ...
-```
-
-#### Issue 5: Out of Disk Space
-
-**Solution:**
-```bash
-# Remove unused data
-docker system prune
-
-# Remove everything (including volumes)
-docker system prune -a --volumes
-
-# Check disk usage
-docker system df
-```
-
-## Troubleshooting
-
-### Container Exits Immediately
-- Check logs: `docker logs <container-id>`
-- Run interactively: `docker run -it <image> bash`
-
-### Port Already in Use
-- Use a different port: `-p 8080:5000` (maps local 8080 to container 5000)
-- Check what's using the port: `lsof -i :5000` (macOS/Linux)
-
-### Image Not Found
-- Check spelling
-- Pull explicitly: `docker pull <image>`
-
-### Permission Denied
-- On Linux, you may need to add your user to the docker group:
-  ```bash
-  sudo usermod -aG docker $USER
-  ```
-
-## Additional Resources
-
-- [Official Docker Documentation](https://docs.docker.com/)
-- [Docker Hub](https://hub.docker.com/)
-- [Docker Cheat Sheet](https://docs.docker.com/get-started/docker_cheatsheet.pdf)
-- [Play with Docker](https://labs.play-with-docker.com/) - Online Docker playground
-
-## 📚 Summary - What You Should Know After This Tutorial
-
-### ✅ Essential Skills (Parts 1-8) - Core Docker Concepts
-After completing the core sections, you should be able to:
-
-**Basics (Parts 1-5):**
-- ✅ **Explain** what Docker is and why it's useful
-- ✅ **Run** containers from pre-built images (`docker run`)
-- ✅ **Manage** containers (start, stop, remove)
-- ✅ **Create** your own Dockerfile
-- ✅ **Build** and run your own Docker images
-- ✅ **Understand** port mapping (`-p 8000:8000`)
-
-**Advanced Basics (Parts 6-8):**
-- ✅ **Persist data** using volumes and bind mounts
-- ✅ **Connect containers** using Docker networks
-- ✅ **Orchestrate multi-container apps** with Docker Compose
-- ✅ **Understand** how volumes, networks, and compose work together
-
-### 🎓 Production Skills (Parts 9-11)
-
-- ✅ Apply production best practices (multi-stage builds, security)
-- ✅ Debug and troubleshoot Docker issues effectively
-- ✅ Build complete real-world applications
-
-## 🎯 Final Thoughts
-
-Docker is a powerful tool that will help you develop, deploy, and manage applications more efficiently.
-
-**Learning path for first semester students:**
-1. **Master Parts 1-5 first** - Basic Docker usage
-2. **Then learn Parts 6-8** - Volumes, Networks, and Compose (essential for real projects!)
-3. **Parts 9-11 are optional** - Come back when you need them
-
-Practice regularly, and don't be afraid to make mistakes. Every expert was once a beginner who kept practicing.
-
-**Remember**:
-- Containers are **isolated** - experiment freely!
-- Docker **saves time** - no more "works on my machine" problems
-- This skill is **valuable** - employers look for Docker experience

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import random
 
 def generate_dummy_wave(duration=2, rate=4096):
     """Generiert Dummy-Daten (Fallback)."""
@@ -12,29 +13,34 @@ def generate_dummy_wave(duration=2, rate=4096):
 
 def load_data(filepath=None):
     """
-    Lädt echte Daten aus einer CSV, falls vorhanden.
-    Sonst generiert es Dummy-Daten.
+    Lädt echte Daten. Wenn die Datei zu lang ist,
+    wird ein ZUFÄLLIGER Ausschnitt von 3 Sekunden gewählt.
     """
     if filepath and os.path.exists(filepath):
         print(f"📂 Lade echte Daten von: {filepath}")
         try:
-            # Lade die CSV (wir nehmen an, das Signal ist in der ersten Spalte oder flach)
+            # CSV laden
             df = pd.read_csv(filepath)
             
-            # Nimm nur die numerischen Werte (flachklopfen zu einem Array)
-            # Falls deine CSV Header hat, wird das hier automatisch gehandhabt
+            # Signal extrahieren (nur numerische Werte, alles in ein Array)
             signal = df.select_dtypes(include=[np.number]).values.flatten()
             
-            # Wir basteln eine Zeitachse dazu (Rate 4096 Hz geschätzt)
-            t = np.linspace(0, len(signal)/4096, len(signal))
-            
-            # Nimm nur die ersten 2-3 Sekunden, damit das Frontend nicht explodiert
+            # Maximale Länge: 3 Sekunden bei 4096 Hz
             max_samples = 4096 * 3
+            
             if len(signal) > max_samples:
-                signal = signal[:max_samples]
-                t = t[:max_samples]
+                # Zufälligen Startpunkt wählen
+                max_start_index = len(signal) - max_samples
+                start_index = random.randint(0, max_start_index)
+                
+                print(f"✂️ Schneide zufälligen Clip von Index {start_index} bis {start_index + max_samples}")
+                signal = signal[start_index : start_index + max_samples]
+            
+            # Zeitachse passend zum (geschnittenen) Signal erstellen
+            t = np.linspace(0, len(signal)/4096, len(signal))
                 
             return t, signal
+
         except Exception as e:
             print(f"⚠️ Fehler beim Laden der Datei: {e}")
             print("Verwende stattdessen Simulation...")

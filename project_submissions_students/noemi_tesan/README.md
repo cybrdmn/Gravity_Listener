@@ -1,7 +1,17 @@
 # 🌌 Gravity Listener
 
-**Gravity Listener** ist eine Full-Stack AI-Applikation, die Gravitationswellen-Daten analysiert und visualisiert. 
-Das Projekt nutzt **echte Signaldaten** (z.B. aus der G2Net Kaggle Challenge), verarbeitet diese mithilfe von `scipy` zu Spektrogrammen und stellt die Ergebnisse über eine **FastAPI**-Schnittstelle bereit. Ein interaktives **Streamlit**-Frontend ermöglicht es Nutzern, diese kosmischen Ereignisse "sichtbar" zu machen.
+**Gravity Listener** ist eine interaktive Full-Stack AI-Applikation zur Analyse von Gravitationswellen.
+Das Projekt visualisiert Signale von kollidierenden schwarzen Löchern ("Chirps") als Spektrogramme und macht sie **hörbar**. Es nutzt echte wissenschaftliche Daten (z.B. LIGO/Virgo) und wählt bei großen Datensätzen automatisch zufällige Ausschnitte zur Exploration.
+
+---
+
+## ✨ Features
+
+* **🔭 Echte Daten:** Verarbeitet reale Signale (z.B. G2Net Kaggle Challenge).
+* **🎲 Random Sampler:** Bei großen Dateien wird automatisch ein zufälliger 3-Sekunden-Clip analysiert – jeder Scan ist einzigartig!
+* **🎧 Audio-Feedback:** Hör dir das "Rauschen des Universums" direkt im Browser an.
+* **🎨 Sci-Fi UI:** Dunkles, immersives Dashboard mit Streamlit.
+* **🐳 Containerized:** Vollständig isolierte Umgebung mit Docker.
 
 ---
 
@@ -10,16 +20,16 @@ Das Projekt nutzt **echte Signaldaten** (z.B. aus der G2Net Kaggle Challenge), v
 Dieses Projekt nutzt Python 3.10.6 und verwaltet Abhängigkeiten über eine virtuelle Umgebung.
 
 ### 1. Voraussetzungen
-Stelle sicher, dass `pyenv` und `pyenv-virtualenv` installiert sind.
+Stelle sicher, dass `pyenv`, `pyenv-virtualenv` und `Docker` installiert sind.
 
 ### 2. Daten herunterladen 💾
 Da echte wissenschaftliche Daten groß sind, sind sie nicht im Repository enthalten.
 1. Lade dir einen Gravitationswellen-Datensatz herunter (z.B. [G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection/data)).
 2. Platziere die `.csv` Datei im Ordner `data/`.
-3. Die App erkennt automatisch die Datei und lädt sie. (Falls keine Datei gefunden wird, startet eine Simulation).
+3. Die App erkennt automatisch die Datei. (Falls keine Datei gefunden wird, startet eine Simulation).
 
-### 3. Installation
-Navigiere in den Projektordner und richte die Umgebung ein:
+### 3. Lokale Installation (Ohne Docker)
+Navigiere in den Projektordner:
 
 ```bash
 # Umgebung erstellen und aktivieren
@@ -37,52 +47,48 @@ pip install -e .
 
 ## 🚀 Verwendung
 
-### API starten
-Die API berechnet die Spektrogramme im Hintergrund.
+### Option A: Mit Docker (Empfohlen) 🐳
+Startet Backend und Frontend in einem isolierten Container.
+
 ```bash
-uvicorn gravity_listener.main:app --reload
-```
-
-### Frontend starten
-Das Dashboard visualisiert die Daten.
-```bash
-streamlit run src/gravity_listener/frontend.py
-```
-
----
-
-## 🐳 Docker (Containerisierung)
-
-Das Projekt ist vollständig containerisiert. 
-
-**Wichtig:** Damit der Container auf deine lokalen Daten zugreifen kann, muss der Data-Ordner gemounted werden oder im Image gebaut sein (hier: im Build integriert).
-
-### Image bauen
-```bash
+# Image bauen
 docker build -t gravity_listener .
-```
 
-### Container starten
-Startet die API auf Port 8000 und das Frontend auf Port 8501.
-```bash
+# Container starten (API auf 8000, Frontend auf 8501)
 docker run -p 8000:8000 -p 8501:8501 gravity_listener
 ```
+Öffne dann **http://localhost:8501** im Browser.
+
+### Option B: Manuell starten
+Falls du entwickelst und ohne Docker arbeiten willst:
+
+1. **API starten:**
+   ```bash
+   uvicorn gravity_listener.main:app --reload
+   ```
+2. **Frontend starten (in neuem Terminal):**
+   ```bash
+   streamlit run src/gravity_listener/frontend.py
+   ```
 
 ---
 
-## 🤖 Automatisierung & Tests
+## 🤖 Automatisierung
 
-Für eine effiziente Entwicklung nutzen wir `make` und Shell-Skripte.
+Für eine effiziente Entwicklung nutzen wir Shell-Skripte (CI/CD Simulation).
 
-### CI/CD Simulation
-Das `autotest.sh` Skript simuliert eine Pipeline, die Installation, Formatierung und Tests automatisch durchführt.
 ```bash
+# Installiert alles, formatiert Code und führt Tests aus
 ./autotest.sh
 ```
 
 ---
 
-## 👥 Credits & Datenquellen
-* **Code & Umsetzung:** Noemi Tesan
+## 👥 Credits & Tech Stack
+Dieses Projekt wurde im Rahmen des AI-Projektkurses erstellt.
+
+* **Author:** Noemi Tesan
 * **Datenquelle:** [Kaggle G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection)
-* **Tools:** FastAPI, Streamlit, SciPy, Docker
+* **Tech Stack:** FastAPI, Streamlit, SciPy, Matplotlib, Docker
+
+> "Listen to the universe." 🌌

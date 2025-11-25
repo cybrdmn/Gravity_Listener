@@ -1,16 +1,16 @@
 # 🌌 Gravity Listener
 
 **Gravity Listener** ist eine interaktive Full-Stack AI-Applikation zur Analyse von Gravitationswellen.
-Das Projekt visualisiert Signale von kollidierenden schwarzen Löchern ("Chirps") als Spektrogramme und macht sie **hörbar**. Es nutzt echte wissenschaftliche Daten (z.B. LIGO/Virgo) und wählt bei großen Datensätzen automatisch zufällige Ausschnitte zur Exploration.
+Das Projekt visualisiert Signale von kollidierenden schwarzen Löchern ("Chirps") als Spektrogramme und macht sie **hörbar**. Es nutzt echte wissenschaftliche Daten (z.B. LIGO/Virgo) und simuliert astrophysikalische Ereignisse mittels "Software Injection".
 
 ---
 
 ## ✨ Features
 
 * **🔭 Echte Daten:** Verarbeitet reale Signale (z.B. G2Net Kaggle Challenge).
-* **🎲 Random Sampler:** Bei großen Dateien wird automatisch ein zufälliger 3-Sekunden-Clip analysiert – jeder Scan ist einzigartig!
-* **🎧 Audio-Feedback:** Hör dir das "Rauschen des Universums" direkt im Browser an.
-* **🎨 Sci-Fi UI:** Dunkles, immersives Dashboard mit Streamlit.
+* **🎲 Random Sampler:** Wählt bei jedem Scan einen zufälligen Sektor des Universums (3-Sekunden-Clip).
+* **🎰 Signal Injection:** Um die Detektion zu testen, wird mit einer **30% Wahrscheinlichkeit** ein künstliches Signal ("Chirp") in das echte Hintergrundrauschen injiziert.
+* **🎧 Audio-Feedback:** Hör dir das Rauschen des Universums (und die versteckten Signale) an.
 * **🐳 Containerized:** Vollständig isolierte Umgebung mit Docker.
 
 ---
@@ -26,7 +26,7 @@ Stelle sicher, dass `pyenv`, `pyenv-virtualenv` und `Docker` installiert sind.
 Da echte wissenschaftliche Daten groß sind, sind sie nicht im Repository enthalten.
 1. Lade dir einen Gravitationswellen-Datensatz herunter (z.B. [G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection/data)).
 2. Platziere die `.csv` Datei im Ordner `data/`.
-3. Die App erkennt automatisch die Datei. (Falls keine Datei gefunden wird, startet eine Simulation).
+3. Die App erkennt automatisch die Datei.
 
 ### 3. Lokale Installation (Ohne Docker)
 Navigiere in den Projektordner:
@@ -47,7 +47,7 @@ pip install -e .
 
 ## 🚀 Verwendung
 
-### Option A: Mit Docker (Empfohlen) 🐳
+### Mit Docker (Empfohlen) 🐳
 Startet Backend und Frontend in einem isolierten Container.
 
 ```bash
@@ -59,23 +59,17 @@ docker run -p 8000:8000 -p 8501:8501 gravity_listener
 ```
 Öffne dann **http://localhost:8501** im Browser.
 
-### Option B: Manuell starten
-Falls du entwickelst und ohne Docker arbeiten willst:
-
-1. **API starten:**
-   ```bash
-   uvicorn gravity_listener.main:app --reload
-   ```
-2. **Frontend starten (in neuem Terminal):**
-   ```bash
-   streamlit run src/gravity_listener/frontend.py
-   ```
+### Wie man testet
+1. Drücke auf **"Scan starten"**.
+2. Meistens hörst du nur **statisches Rauschen** (Realität).
+3. Drücke so lange weiter, bis du den **"Jackpot"** triffst (30% Chance).
+4. Dann hörst du einen **"Whooop"-Sound** und siehst die gelbe Kurve im Spektrogramm.
 
 ---
 
 ## 🤖 Automatisierung
 
-Für eine effiziente Entwicklung nutzen wir Shell-Skripte (CI/CD Simulation).
+Für eine effiziente Entwicklung nutzen wir Shell-Skripte.
 
 ```bash
 # Installiert alles, formatiert Code und führt Tests aus

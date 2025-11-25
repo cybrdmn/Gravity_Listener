@@ -1,0 +1,19 @@
+# Python internals
+__pycache__/
+*.py[cod]
+
+# Virtual Environment (ignore the toolbox!)
+.pyenv
+.venv
+env/
+venv/
+ENV/
+
+# Environment Variables (Keep secrets secret)
+.env
+
+# Mac system files
+.DS_Store
+
+# Data (often too big for Git)
+data/

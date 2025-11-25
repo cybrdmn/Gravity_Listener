@@ -1,88 +1,101 @@
 # 🌌 Gravity Listener
 
-**Gravity Listener** ist eine interaktive Full-Stack AI-Applikation zur Analyse von Gravitationswellen.
-Das Projekt visualisiert Signale von kollidierenden schwarzen Löchern ("Chirps") als Spektrogramme und macht sie **hörbar**. Es nutzt echte wissenschaftliche Daten (z.B. LIGO/Virgo) und simuliert astrophysikalische Ereignisse mittels "Software Injection".
+**Gravity Listener** is an interactive full-stack AI application for analyzing gravitational waves.
+The project visualizes signals from colliding black holes ("chirps") as spectrograms and makes them **audible**. It leverages real scientific data (e.g., LIGO/Virgo) and simulates astrophysical events via "software injection".
 
 ---
 
 ## ✨ Features
 
-* **🔭 Echte Daten:** Verarbeitet reale Signale (z.B. G2Net Kaggle Challenge).
-* **🎲 Random Sampler:** Wählt bei jedem Scan einen zufälligen Sektor des Universums (3-Sekunden-Clip).
-* **🎰 Signal Injection:** Um die Detektion zu testen, wird mit einer **30% Wahrscheinlichkeit** ein künstliches Signal ("Chirp") in das echte Hintergrundrauschen injiziert.
-* **🎧 Audio-Feedback:** Hör dir das Rauschen des Universums (und die versteckten Signale) an.
-* **🐳 Containerized:** Vollständig isolierte Umgebung mit Docker.
+* **🔭 Real Data:** Processes actual signal data (e.g., G2Net Kaggle Challenge).
+* **🎲 Random Sampler:** Automatically selects a random 3-second sector of the universe for every scan – every analysis is unique.
+* **🎰 Signal Injection:** To test detection capabilities, there is a **30% probability** of an artificial signal ("chirp") being injected into the background noise.
+* **🎧 Audio Feedback:** Listen to the cosmic noise (and hidden signals) directly in your browser.
+* **🐳 Containerized:** Fully isolated environment using Docker.
+* **🎨 Sci-Fi UI:** Immersive dark-mode dashboard built with Streamlit.
 
 ---
 
 ## 🛠️ Setup & Installation
 
-Dieses Projekt nutzt Python 3.10.6 und verwaltet Abhängigkeiten über eine virtuelle Umgebung.
+This project uses Python 3.10.6 and manages dependencies via a virtual environment.
 
-### 1. Voraussetzungen
-Stelle sicher, dass `pyenv`, `pyenv-virtualenv` und `Docker` installiert sind.
+### 1. Prerequisites
+Ensure that `pyenv`, `pyenv-virtualenv`, and `Docker` are installed.
 
-### 2. Daten herunterladen 💾
-Da echte wissenschaftliche Daten groß sind, sind sie nicht im Repository enthalten.
-1. Lade dir einen Gravitationswellen-Datensatz herunter (z.B. [G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection/data)).
-2. Platziere die `.csv` Datei im Ordner `data/`.
-3. Die App erkennt automatisch die Datei.
+### 2. Download Data 💾
+Since scientific datasets are large, they are not included in the repository.
+1. Download a gravitational wave dataset (e.g., [G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection/data)).
+2. Place the `.csv` file inside the `data/` folder.
+3. The app automatically detects the file. (If no file is found, it falls back to a full simulation).
 
-### 3. Lokale Installation (Ohne Docker)
-Navigiere in den Projektordner:
+### 3. Local Installation (Without Docker)
+Navigate to the project folder:
 
 ```bash
-# Umgebung erstellen und aktivieren
+# Create and activate environment
 pyenv virtualenv 3.10.6 gravity_env
 pyenv activate gravity_env
 
-# Abhängigkeiten installieren
+# Install dependencies
 pip install -r requirements.txt
 
-# Das Projekt als lokales Package installieren
+# Install project as a local package
 pip install -e .
 ```
 
 ---
 
-## 🚀 Verwendung
+## 🚀 Usage
 
-### Mit Docker (Empfohlen) 🐳
-Startet Backend und Frontend in einem isolierten Container.
+### Option A: Using Docker (Recommended) 🐳
+Starts both Backend and Frontend in an isolated container.
 
 ```bash
-# Image bauen
+# Build the image
 docker build -t gravity_listener .
 
-# Container starten (API auf 8000, Frontend auf 8501)
+# Start the container (API on 8000, Frontend on 8501)
 docker run -p 8000:8000 -p 8501:8501 gravity_listener
 ```
-Öffne dann **http://localhost:8501** im Browser.
+Then open **http://localhost:8501** in your browser.
 
-### Wie man testet
-1. Drücke auf **"Scan starten"**.
-2. Meistens hörst du nur **statisches Rauschen** (Realität).
-3. Drücke so lange weiter, bis du den **"Jackpot"** triffst (30% Chance).
-4. Dann hörst du einen **"Whooop"-Sound** und siehst die gelbe Kurve im Spektrogramm.
+### Option B: Manual Start
+If you are developing locally without Docker:
+
+1. **Start API:**
+   ```bash
+   uvicorn gravity_listener.main:app --reload
+   ```
+2. **Start Frontend (in a new terminal):**
+   ```bash
+   streamlit run src/gravity_listener/frontend.py
+   ```
+
+### 🧪 How to Test (Live Demo)
+1. Click **"Start Scan"**.
+2. Most of the time, you will hear **static noise** (this is physical reality).
+3. Keep scanning until you hit the **"Jackpot"** (30% chance).
+4. You will hear a distinct **"Whooop"** sound and see a bright yellow curve in the spectrogram.
 
 ---
 
-## 🤖 Automatisierung
+## 🤖 Automation & CI/CD
 
-Für eine effiziente Entwicklung nutzen wir Shell-Skripte.
+For efficient development, we use shell scripts to simulate a CI/CD pipeline.
 
 ```bash
-# Installiert alles, formatiert Code und führt Tests aus
+# Installs dependencies, formats code, and runs tests
 ./autotest.sh
 ```
 
 ---
 
 ## 👥 Credits & Tech Stack
-Dieses Projekt wurde im Rahmen des AI-Projektkurses erstellt.
+Created as part of the AI Project Course.
 
 * **Author:** Noemi Tesan
-* **Datenquelle:** [Kaggle G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection)
+* **Data Source:** [Kaggle G2Net Gravitational Wave Detection](https://www.kaggle.com/c/g2net-gravitational-wave-detection)
 * **Tech Stack:** FastAPI, Streamlit, SciPy, Matplotlib, Docker
 
 > "Listen to the universe." 🌌

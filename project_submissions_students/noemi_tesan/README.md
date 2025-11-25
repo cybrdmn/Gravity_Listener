@@ -45,6 +45,40 @@ streamlit run src/gravity_listener/frontend.py
 
 ---
 
+## 🐳 Docker (Containerisierung)
+
+Das Projekt ist vollständig containerisiert. Du kannst die gesamte App (API + Frontend) mit einem einzigen Befehl starten, ohne Python lokal installieren zu müssen.
+
+### Image bauen
+```bash
+docker build -t gravity_listener .
+```
+
+### Container starten
+Startet die API auf Port 8000 und das Frontend auf Port 8501.
+```bash
+docker run -p 8000:8000 -p 8501:8501 gravity_listener
+```
+
+---
+
+## 🤖 Automatisierung & Tests
+
+Für eine effiziente Entwicklung nutzen wir `make` und Shell-Skripte.
+
+### Makefile Befehle
+* `make install`: Installiert alle Abhängigkeiten und das Package.
+* `make test`: Führt die Test-Suite (Pytest) aus.
+* `make clean`: Entfernt temporäre Dateien.
+
+### CI/CD Simulation
+Das `autotest.sh` Skript simuliert eine Pipeline, die Installation, Formatierung und Tests automatisch durchführt.
+```bash
+./autotest.sh
+```
+
+---
+
 ## 🏗️ Projektstruktur
 
 ```
@@ -57,6 +91,9 @@ streamlit run src/gravity_listener/frontend.py
 │   │   ├── main.py         # FastAPI Backend
 │   │   └── frontend.py     # Streamlit Dashboard
 ├── tests/                  # Automatisierte Tests
+├── Dockerfile              # Container-Konfiguration
+├── Makefile                # Befehls-Shortcuts
+├── autotest.sh             # CI/CD Skript
 ├── requirements.txt        # Projekt-Abhängigkeiten
 ├── setup.py                # Package-Konfiguration
 └── README.md               # Projektdokumentation

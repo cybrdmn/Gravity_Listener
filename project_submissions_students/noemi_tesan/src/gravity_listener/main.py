@@ -2,29 +2,31 @@ from fastapi import FastAPI
 from gravity_listener.data_loader import load_data
 from gravity_listener.processing import compute_spectrogram
 import numpy as np
+import os
 
-# Initialize the API
-app = FastAPI(title="Gravity Listener API", version="0.1")
+app = FastAPI(title="Gravity Listener API", version="0.2")
 
 @app.get("/")
 def read_root():
-    """Health check endpoint."""
-    return {"message": "Gravity Listener API is online and listening! 🌌"}
+    return {"message": "Gravity Listener API is online! 🌌"}
 
 @app.get("/analyze")
 def analyze_wave():
-    """
-    Loads the dummy gravity wave, computes the spectrogram, 
-    and returns the raw data arrays so the frontend can plot them.
-    """
-    # 1. Get the raw signal
-    t, signal = load_data()
+    # HIER DEN DATEINAMEN ANPASSEN!
+    # 👇👇👇
+    csv_filename = "data/60k_submission.csv" 
     
-    # 2. Process it into a spectrogram
-    # (We use a smaller sample_rate here just to keep the JSON size manageable for the demo)
-    f, t_spec, Sxx = compute_spectrogram(signal, sample_rate=1024)
+    # Prüfen, ob wir im Docker sind oder lokal
+    if not os.path.exists(csv_filename):
+        # Falls kein Data-Ordner da ist, lass Data Loader den Fallback machen
+        print("Keine CSV gefunden, nutze Simulation.")
+        t, signal = load_data(filepath=None)
+    else:
+        t, signal = load_data(filepath=csv_filename)
     
-    # 3. Return as JSON (Web APIs can't send Numpy arrays, so we convert to lists)
+    # Spektrogramm berechnen
+    f, t_spec, Sxx = compute_spectrogram(signal, sample_rate=4096)
+    
     return {
         "frequencies": f.tolist(),
         "times": t_spec.tolist(),
